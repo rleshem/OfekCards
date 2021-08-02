@@ -1,4 +1,4 @@
-package ofek.line;
+package bibcards.line;
 
 /*
 כרטיס-גנזים 109:

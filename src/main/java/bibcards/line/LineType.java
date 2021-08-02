@@ -1,4 +1,4 @@
-package ofek.line;
+package bibcards.line;
 
 public enum LineType {
     Name,       // ש (שם)
