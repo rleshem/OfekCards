@@ -31,9 +31,9 @@ class LineTest {
 
     @Test
     void createLineOf() {
-        Line line = Line.createLineOf("ט");
+        Line line = Line.createLineOf("ט", 0);
         assert line.getType() == Line.LineType.PSEUDONYM;
-        line = Line.createLineOf("ה");
+        line = Line.createLineOf("ה", 0);
         assert line.getType() == Line.LineType.REMARK;
     }
 }

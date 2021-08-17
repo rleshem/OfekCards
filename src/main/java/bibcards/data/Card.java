@@ -57,7 +57,7 @@ public class Card {
             int num = 0;
             int i = 0;
             // Skip past spaces - the only legal character before the number
-            while (i < parts[1].length() && !Character.isSpaceChar((parts[1].charAt(i)))) {
+            while (i < parts[1].length() && Character.isSpaceChar((parts[1].charAt(i)))) {
                 ++i;
             }
             if (i < parts[1].length()) {
@@ -77,9 +77,15 @@ public class Card {
 
     public void addLine(Line line) {
         // get the prefix of line
-        String[] parts = line.getContent().split(":");
-        this.tmpDescriptor.concat(parts[0] + "_");
+        tmpDescriptor = tmpDescriptor.concat(line.getPrefix() + "_");
     }
 
-
+    @Override
+    public String toString() {
+        return "Card{" +
+                "cardType=" + cardType +
+                ", cardNumber=" + cardNumber +
+                ", tmpDescriptor='" + tmpDescriptor + '\'' +
+                '}';
+    }
 }

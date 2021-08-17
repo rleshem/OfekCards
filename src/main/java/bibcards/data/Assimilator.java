@@ -19,6 +19,7 @@ public class Assimilator {
     private BufferedReader reader;
     private String nextContentLine = null;
     private int numLines = 0;
+    private boolean fileExhausted = false;
 
     public static Assimilator getAssimilator() {
         if (assimilator == null) {
@@ -44,6 +45,7 @@ public class Assimilator {
             String line = reader.readLine();
             if (line == null) {
                 Logger.log(1, "file exhausted after " + numLines + " lines");
+                fileExhausted = true;
                 return null;
             }
             numLines++;
@@ -60,7 +62,8 @@ public class Assimilator {
     public List<Card> readCards() throws IOException {
         List<Card> cards = new ArrayList<>();
         while (true) {
-            nextContentLine = readContentLine();
+            if (nextContentLine == null)
+                nextContentLine = readContentLine();
             Card card = Card.genCard(nextContentLine);
             if (card == null) {
                 if (cards.size() > 0) {
@@ -74,7 +77,11 @@ public class Assimilator {
             Logger.log(2, "read card at line " + numLines + ": " + nextContentLine);
             fillCard(card);
             cards.add(card);
-            Logger.log(2, "filled card no. " + cards.size() + "' reached line " + numLines + ", next line: " + nextContentLine);
+            Logger.log(2, "filled card no. " + cards.size() + " - reached line " + numLines + ", next line: " + nextContentLine);
+            if (fileExhausted) {
+                Logger.log(1, "File exhausted, read " + cards.size() + " cards, stored in " + numLines + " data lines");
+                return cards;
+            }
         }
     }
 
@@ -82,6 +89,8 @@ public class Assimilator {
         while (true) {
             try {
                 nextContentLine = readContentLine();
+                if (fileExhausted)
+                    return;
                 if (Card.isCardHeaderLine(nextContentLine)) {
                     Logger.log(4, "filled card <" + card.toString() + ">");
                     return;
@@ -90,7 +99,8 @@ public class Assimilator {
                 e.printStackTrace();
             }
             String prefixOfLine = nextContentLine.substring(0, 1);
-            Line line = Line.createLineOf(prefixOfLine);
+            Line line = Line.createLineOf(prefixOfLine, numLines);
+            line.setContent(nextContentLine);
             if (line == null) {
                 Logger.error("line type not identified, line=<" + nextContentLine + ">");
             } else {
@@ -101,37 +111,6 @@ public class Assimilator {
 
     private String getFileName() {
         return dataFile.getAbsolutePath();
-    }
-
-    @Deprecated
-    public void readData() throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(dataFile));
-        ;
-        int numLines = 0;
-        while (true) {
-            String line = reader.readLine();
-            if (line == null) {
-                Logger.log(1, "file exhausted after " + numLines + " lines");
-                return;
-            }
-            if (line.length() < 1)  // skip empty lines
-                continue;
-
-            if (line.startsWith(commentChar)) // skip comment lines
-                continue;
-
-            int separatorPos = line.indexOf(prefixEnd);
-            if (separatorPos < 0) { // no prefix in line - problem
-                System.err.println("line <" + numLines + "> - no prefix separator found: " + line);
-                continue;
-            }
-
-            String prefix = line.substring(0, separatorPos);
-            boolean okPrefix = PreFixer.isKey(prefix);
-            System.out.println("line <" + numLines + ">: prefix=[" + prefix + "]  recognized=" + okPrefix);
-
-            numLines++;
-        }
     }
 
     public static void main(String[] args) throws IOException {
