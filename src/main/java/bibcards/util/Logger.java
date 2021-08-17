@@ -6,12 +6,13 @@ import java.io.IOException;
 
 public class Logger {
 
-    public static String folderLogfiles = "C:\\Users\\OWNER\\IdeaProjects\\bibcards\\src\\main\\log\\";
+    public static String folderLogfiles = "C:\\Users\\OWNER\\IdeaProjects\\OfekCards\\src\\main\\log\\";
 
     private static int logLevel = 1;
     private static boolean isLog = false;
     //        private static String logUniqueIdenifier = "";
     private static FileWriter logWriter = null;
+    private static FileWriter errorWriter = null;
     private static boolean initialized = false;
 
 /*    static {
@@ -38,8 +39,6 @@ public class Logger {
         String res = sb.toString();
         System.out.println(res);
         if (isLog) {
-            if (logWriter == null)
-                createLogFile();
             try {
                 logWriter.write(res.endsWith("\n") ? res : res + "\n");
             } catch (IOException e) {
@@ -55,11 +54,12 @@ public class Logger {
             logLevel = Setup.getSetup().getIntProperty(Setup.logProp);
         if (Setup.getSetup().getBooleanProperty(Setup.logOutput) == true) {
             isLog = true;
-            //IZKOR logUniqueIdenifier = Setup.getSetup().getStringProperty(Setup.logUniqueIdentifier);
         }
+        createLogFiles();
         initialized = true;
     }
-    private static void createLogFile() {
+    private static void createLogFiles() {
+        // initialize LOG file
         String fileName =
                 folderLogfiles
                         + MiscHelper.getCurrentTimeAsString()
@@ -67,9 +67,24 @@ public class Logger {
 //                        + "_" + logUniqueIdenifier
                         + "_" + logLevel
                         + ".logo";
-        File logFile = new File(fileName);
+        File file = new File(fileName);
         try {
-            logWriter = new FileWriter(logFile);
+            logWriter = new FileWriter(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // initialize ERROR file
+        fileName =
+                folderLogfiles
+                        + MiscHelper.getCurrentTimeAsString()
+                        + Setup.getSetup().getMainClassname()
+//                        + "_" + logUniqueIdenifier
+                        + "_" + logLevel
+                        + ".erro";
+        file = new File(fileName);
+        try {
+            errorWriter = new FileWriter(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -79,5 +94,16 @@ public class Logger {
         if (logWriter != null) {
             logWriter.close();
         }
+    }
+
+    public static void error(String errorMessage) {
+        if (!initialized)
+            initLogs();
+        try {
+            errorWriter.write(errorMessage + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.err.println(errorMessage);
     }
 }

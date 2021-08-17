@@ -1,7 +1,7 @@
-package bibcards.line;
+package bibcards.data;
 
 public class PseudonymLine extends Line {
     public PseudonymLine() {
-        super(LineType.Pseudonym);
+        super(LineType.PSEUDONYM);
     }
 }

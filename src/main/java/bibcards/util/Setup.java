@@ -11,6 +11,8 @@ public class Setup {
 
     public static String logProp = "log";
     public static String logOutput = "log_output";
+    public static String dataFile = "data_file";
+    public static String prefixes = "prefixes";
 
     /*
         public static String dbProp = "db";
@@ -78,11 +80,13 @@ public class Setup {
             // get the property value and print it out
             for (String key : properties.stringPropertyNames()) {
                 String value = properties.getProperty(key);
-                Logger.log(4, key + "=" + value);
+                // DO NOT use Logger here - stackoverflow WILL happen
+                System.out.println(key + "=" + value);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        System.out.println("end Setup");
     }
 
     public boolean isHasKey(String key) {
