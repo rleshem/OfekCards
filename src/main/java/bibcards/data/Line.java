@@ -31,6 +31,7 @@ public abstract class Line {
         PSEUDONYM,  // yes: ט (שם עט)
         SUB_TITLE,  // yes: ת (תת כותרת)
         IMPORTANCE, // yes: ח (חשיבות)
+        REPORTER,   // yes: ר (רשם, כתב)
         CARD        // yes: כ (כרטיס-גנזים)
     }
 
@@ -50,6 +51,7 @@ public abstract class Line {
         put("ט", PseudonymLine::new);
         put("ת", SubTitleLine::new);
         put("ח", ImportanceLine::new);
+        put("ר", ReporterLine::new);
         put("כ", CardLine::new);
     }};
 
