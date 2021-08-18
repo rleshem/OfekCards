@@ -25,7 +25,8 @@ public class Card {
     private static String cardTranslator = "כרטיס-מתרגם-גנזים";
     private static String cardAboutWriter = "כרטיס-עליו-גנזים";
     private static String cardAboutTranslator = "כרטיס-אודות-מתרגם-גנזים";
-    private static String cardAboutEditor = "כרטיס-עורך-אודות-גנזים";
+    private static String cardAboutEditor = "כרטיס-אודות-עורך-גנזים";
+
 
     private final CardType cardType;
     private int cardNumber;
