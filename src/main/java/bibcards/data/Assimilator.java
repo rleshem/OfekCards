@@ -98,6 +98,13 @@ public class Assimilator {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            // look for Xi lines, such as "ת1: בלה"
+            int splitterPos = nextContentLine.indexOf(':');
+            String linePrefix = nextContentLine.substring(0, splitterPos);
+            if (linePrefix.length() > 1) {
+                Logger.error("found Xi line, line number=" + numLines);
+            }
+            // look till here
             String prefixOfLine = nextContentLine.substring(0, 1);
             Line line = Line.createLineOf(prefixOfLine, numLines);
             line.setContent(nextContentLine);
