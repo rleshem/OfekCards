@@ -13,6 +13,7 @@ public class Setup {
     public static String logOutput = "log_output";
     public static String dataFile = "data_file";
     public static String prefixes = "prefixes";
+    public static String processDates = "process_dates";
 
     /*
         public static String dbProp = "db";

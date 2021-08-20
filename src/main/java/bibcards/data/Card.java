@@ -12,6 +12,44 @@ public class Card {
                 line.startsWith(cardAboutEditor));
     }
 
+    public String getLineContent(Line.LineType lineType) {
+        switch (lineType) {
+            case NAME:
+                return (nameLine != null) ? nameLine.getContent() : null;
+            case REMARK:
+                return (remarkLine != null) ? remarkLine.getContent() : null;
+            case SOURCE:
+                return (sourceLine != null) ? sourceLine.getContent() : null;
+            case IMPORTANCE:
+                return (importanceLine != null) ? importanceLine.getContent() : null;
+            case PSEUDONYM:
+                return (pseudonymLine != null) ? pseudonymLine.getContent() : null;
+            case CARD:
+                return (cardLine != null) ? cardLine.getContent() : null;
+            case SUB_TITLE:
+                return (subTitleLine != null) ? subTitleLine.getContent() : null;
+            case GREG_DATE:
+                return (gregDateLine != null) ? gregDateLine.getContent() : null;
+            case HEB_DATE:
+                return (hebDateLine != null) ? hebDateLine.getContent() : null;
+            case PAGE:
+                return (pageLine != null) ? pageLine.getContent() : null;
+            case PERSON:
+                return (personLine != null) ? personLine.getContent() : null;
+            case REPORTER:
+                return (reporterLine != null) ? reporterLine.getContent() : null;
+            case SECTION:
+                return (sectionLine != null) ? sectionLine.getContent() : null;
+            default:
+                Logger.error("cannot handle line type=" + lineType);
+                return null;
+        }
+    }
+
+    public int getCardNumber() {
+        return cardNumber;
+    }
+
     // CardType is enum of publication type of the subject
     public enum CardType {
         WRITER,             // card detailing subject's publication
@@ -20,6 +58,20 @@ public class Card {
         ABOUT_TRANSLATOR,   // card detailing publication about subject as translator
         ABOUT_EDITOR,       // card detailing publication about subject as editor
     }
+
+    private NameLine nameLine = null;
+    private RemarkLine remarkLine = null;
+    private SourceLine sourceLine = null;
+    private HebDateLine hebDateLine = null;
+    private GregDateLine gregDateLine = null;
+    private PageLine pageLine = null;
+    private PseudonymLine pseudonymLine = null;
+    private SubTitleLine subTitleLine = null;
+    private ImportanceLine importanceLine = null;
+    private ReporterLine reporterLine = null;
+    private SectionLine sectionLine = null;
+    private PersonLine personLine = null;
+    private CardLine cardLine = null;
 
     private static String cardWriter = "כרטיס-כותב-גנזים";
     private static String cardTranslator = "כרטיס-מתרגם-גנזים";
@@ -49,6 +101,8 @@ public class Card {
 
     public Card(CardType cardType, String cardHeader) {
         this.cardType = cardType;
+        this.cardLine = new CardLine();
+//        this.cardLine.setContent(cardHeader);
 
         // get card number from cardHeader
         String[] parts = cardHeader.split(" ");
@@ -76,9 +130,55 @@ public class Card {
         }
     }
 
-    public void addLine(Line line) {
+    public void addLine(Line line, int numLines) {
+        switch (line.getType()) {
+            case NAME:
+                nameLine = (nameLine == null) ? (NameLine) line : (NameLine) nameLine.joinContent(line, numLines, cardNumber);
+                break;
+            case REMARK:
+                this.remarkLine = (remarkLine == null) ? (RemarkLine) line : (RemarkLine) remarkLine.joinContent(line, numLines, cardNumber);
+                break;
+            case SOURCE:
+                this.sourceLine = (sourceLine == null) ? (SourceLine) line : (SourceLine) sourceLine.joinContent(line, numLines, cardNumber);;
+                break;
+            case HEB_DATE:
+                this.hebDateLine = (hebDateLine == null) ? (HebDateLine) line : (HebDateLine) hebDateLine.joinContent(line, numLines, cardNumber);
+                break;
+            case GREG_DATE:
+                this.gregDateLine = (gregDateLine == null) ? (GregDateLine) line : (GregDateLine) gregDateLine.joinContent(line, numLines, cardNumber);
+                break;
+            case PAGE:
+                this.pageLine = (pageLine == null) ? (PageLine) line : (PageLine) pageLine.joinContent(line, numLines, cardNumber);
+                break;
+            case PSEUDONYM:
+                this.pseudonymLine = (pseudonymLine == null) ? (PseudonymLine) line : (PseudonymLine) pseudonymLine.joinContent(line, numLines, cardNumber);
+                break;
+            case SUB_TITLE:
+                this.subTitleLine = (subTitleLine == null) ? (SubTitleLine) line : (SubTitleLine) subTitleLine.joinContent(line, numLines, cardNumber);
+                break;
+            case IMPORTANCE:
+                this.importanceLine = (importanceLine == null) ? (ImportanceLine) line : (ImportanceLine) importanceLine.joinContent(line, numLines, cardNumber);
+                break;
+            case REPORTER:
+                this.reporterLine = (reporterLine == null) ? (ReporterLine) line : (ReporterLine) reporterLine.joinContent(line, numLines, cardNumber);
+                break;
+            case SECTION:
+                this.sectionLine = (sectionLine == null) ? (SectionLine) line : (SectionLine) sectionLine.joinContent(line, numLines, cardNumber);
+                break;
+            case PERSON:
+                this.personLine = (personLine == null) ? (PersonLine) line : (PersonLine) personLine.joinContent(line, numLines, cardNumber);
+                break;
+            case CARD:
+                Logger.error("card " + this.cardNumber + " of type <" + this.cardType + "> - cannot accept another card line=<" + line.toString() + ">");
+                break;
+            default:
+                Logger.error("card " + this.cardNumber + " of type <" + this.cardType + "> - unknown type of line=<" + line.toString() + ">");
+                break;
+        }
+
         // get the prefix of line
-        tmpDescriptor = tmpDescriptor.concat(line.getPrefix() + "_");
+        tmpDescriptor = tmpDescriptor.concat(line.getType().name() + "_");
+
     }
 
     @Override

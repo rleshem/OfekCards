@@ -20,6 +20,18 @@ public abstract class Line {
     protected String prefix;
     protected String content;
 
+    public Line joinContent(Line line, int numLines, int cardNumber) {
+        if (content == null) {
+            Logger.error("card=" + cardNumber + ", received line to join, line no. " + numLines + " of type " + type + " - but has no content yet, cannot join");
+            return this;
+        }
+        if ((type != LineType.REMARK) && (type != LineType.SUB_TITLE))
+            Logger.error("card=" + cardNumber + " -joining non-comment lines, type=" + type + ", added line=" + numLines);
+        Logger.log(4, type + ": card=" + cardNumber + ", joining <" + line.content + "> to existing <" + content + ">");
+        content = content.concat(" | ").concat(line.content);
+        return this;
+    }
+
     public enum LineType {
         NAME,       // yes: ש (שם)
         REMARK,     // yes: ה (הערה)
@@ -27,11 +39,13 @@ public abstract class Line {
         HEB_DATE,   // yes: ע (עברי)
         GREG_DATE,  // yes: ל (לועזי)
         PAGE,       // yes: ד (דף)
-        REF_KIND,   // ס (סוג: מחבר, תרגום, ...)
         PSEUDONYM,  // yes: ט (שם עט)
         SUB_TITLE,  // yes: ת (תת כותרת)
         IMPORTANCE, // yes: ח (חשיבות)
         REPORTER,   // yes: ר (רשם, כתב)
+        SECTION,    // yes: (מדור, מוסף) ס
+        PERSON,     // yes: (אישיות) א
+
         CARD        // yes: כ (כרטיס-גנזים)
     }
 
@@ -52,6 +66,8 @@ public abstract class Line {
         put("ת", SubTitleLine::new);
         put("ח", ImportanceLine::new);
         put("ר", ReporterLine::new);
+        put("ס", SectionLine::new);
+        put("א", PersonLine::new);
         put("כ", CardLine::new);
     }};
 
@@ -62,15 +78,6 @@ public abstract class Line {
             System.exit(-1);
         }
         return supplier.get();
-    }
-
-    public static Line genLine(LineType type) {
-        switch (type) {
-            case PSEUDONYM:
-                return new PseudonymLine();
-            default:
-                throw new IllegalArgumentException("cannot generate data type <" + type + ">");
-        }
     }
 
     public Line(LineType type) {
@@ -87,29 +94,40 @@ public abstract class Line {
 
     // ש: א. שמאלי באור חדש ; ויהי המבול על הארץ החלוצים
     public void setContent(String inputLine) {
-        if (!inputLine.contains(":"))
-            Logger.error("no : in input line");
-        this.prefix = inputLine.substring(0, inputLine.indexOf(':'));
-        /*
-            skip the prefix part, potentially with digit:
-            ש: א. שמאלי באור חדש
-            ש1: א. שמאלי באור חדש
-         */
+        if (!inputLine.contains(":")) {
+            Logger.error("line no. " +
+                    Assimilator.getAssimilator().getNumLines() + " has no ':' character - cannot process");
+            return;
+        }
         int dividerPos = inputLine.indexOf(":") + 1;
-        // skip spaces after ":" - if exist
-        boolean keepLooking = true;
-        while (keepLooking) {
-            if (inputLine.length() <= dividerPos) {
-                Logger.error("no content in line <" + inputLine + ">");
-                this.content = "~ no content in line ~";
+        // skip spaces after ':'
+        while (inputLine.charAt(dividerPos) == ' ')
+            dividerPos++;
+        this.content = inputLine.substring(dividerPos);
+/*        if (getType() == LineType.CARD)
+            Logger.error("CARD LINE ???");
+            // expected input: card-card-letters num:
+            String[] parts = inputLine.split(" ");
+            if (parts.length != 2) {
+                Logger.error("card line no. " +
+                        Assimilator.getAssimilator().getNumLines() + ": expected 2 parts, has " + parts.length + " parts - cannot process");
                 return;
             }
-            if (inputLine.charAt(dividerPos) == ' ')
-                dividerPos++;
-            else
-                keepLooking = false;
-        }
-        this.content = inputLine.substring(dividerPos);
+            this.prefix = inputLine.substring(0, inputLine.indexOf(':'));
+            // skip spaces after ":" - if exist
+            boolean keepLooking = true;
+            while (keepLooking) {
+                if (inputLine.length() <= dividerPos) {
+                    Logger.error("no content in line <" + inputLine + ">");
+                    this.content = "~ no content in line ~";
+                    return;
+                }
+                if (inputLine.charAt(dividerPos) == ' ')
+                    dividerPos++;
+                else
+                    keepLooking = false;
+            }
+*/
     }
 
     public String getPrefix() {
@@ -117,5 +135,14 @@ public abstract class Line {
     }
 
     public boolean isCanBeMulti() { return false; }
+
+    @Override
+    public String toString() {
+        return "Line{" +
+                "type=" + type +
+                ", prefix='" + prefix + '\'' +
+                ", content='" + content + '\'' +
+                '}';
+    }
 
 }

@@ -8,10 +8,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Assimilator {
 
+    private Map<Line.LineType, Integer> maxLineLenMap = new HashMap<Line.LineType, Integer>();
     private static char prefixEnd = ':';
     private static String commentChar = "#";
     private static Assimilator assimilator = null;
@@ -38,6 +41,10 @@ public class Assimilator {
         if (!dataFile.exists())
             throw new IOException("file not found: " + fileName);
         reader = new BufferedReader(new FileReader(dataFile));
+    }
+
+    public int getNumLines() {
+        return numLines;
     }
 
     private String readContentLine() throws IOException {
@@ -111,7 +118,11 @@ public class Assimilator {
             if (line == null) {
                 Logger.error("line type not identified, line=<" + nextContentLine + ">");
             } else {
-                card.addLine(line);
+                card.addLine(line, numLines);
+                Integer currMax =maxLineLenMap.get(line.getType());
+                int currMaxLen = (currMax == null) ? 0 : maxLineLenMap.get(line.getType()).intValue();
+                if (currMaxLen < line.getContent().length())
+                    maxLineLenMap.put(line.getType(), line.getContent().length());
             }
         }
     }
@@ -120,9 +131,21 @@ public class Assimilator {
         return dataFile.getAbsolutePath();
     }
 
+    private void dumpMaxLineLength() {
+        for (Map.Entry mapElement : maxLineLenMap.entrySet()) {
+            Line.LineType entry = (Line.LineType) mapElement.getKey();
+            int value = maxLineLenMap.get(entry);
+            Logger.log(1, entry.name() + ": " + value);
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         Assimilator assimilator = Assimilator.getAssimilator();
         List<Card> cards = assimilator.readCards();
+        for (Card card : cards) {
+            Logger.log(3, "card=" + card.getCardNumber() + ": name=" + card.getLineContent(Line.LineType.NAME) + ", source=" + card.getLineContent(Line.LineType.SOURCE) + ", importance=" + card.getLineContent(Line.LineType.IMPORTANCE));
+        }
+        assimilator.dumpMaxLineLength();
         Logger.log(1, "read " + cards.size() + " from file <" + assimilator.getFileName() + ">");
     }
 
