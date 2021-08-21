@@ -2,53 +2,9 @@ package bibcards.data;
 
 import bibcards.util.Logger;
 
+import java.time.LocalDate;
+
 public class Card {
-
-    public static boolean isCardHeaderLine(String line) {
-        return (line.startsWith(cardWriter) ||
-                line.startsWith(cardTranslator) ||
-                line.startsWith(cardAboutWriter) ||
-                line.startsWith(cardAboutTranslator) ||
-                line.startsWith(cardAboutEditor));
-    }
-
-    public String getLineContent(Line.LineType lineType) {
-        switch (lineType) {
-            case NAME:
-                return (nameLine != null) ? nameLine.getContent() : null;
-            case REMARK:
-                return (remarkLine != null) ? remarkLine.getContent() : null;
-            case SOURCE:
-                return (sourceLine != null) ? sourceLine.getContent() : null;
-            case IMPORTANCE:
-                return (importanceLine != null) ? importanceLine.getContent() : null;
-            case PSEUDONYM:
-                return (pseudonymLine != null) ? pseudonymLine.getContent() : null;
-            case CARD:
-                return (cardLine != null) ? cardLine.getContent() : null;
-            case SUB_TITLE:
-                return (subTitleLine != null) ? subTitleLine.getContent() : null;
-            case GREG_DATE:
-                return (gregDateLine != null) ? gregDateLine.getContent() : null;
-            case HEB_DATE:
-                return (hebDateLine != null) ? hebDateLine.getContent() : null;
-            case PAGE:
-                return (pageLine != null) ? pageLine.getContent() : null;
-            case PERSON:
-                return (personLine != null) ? personLine.getContent() : null;
-            case REPORTER:
-                return (reporterLine != null) ? reporterLine.getContent() : null;
-            case SECTION:
-                return (sectionLine != null) ? sectionLine.getContent() : null;
-            default:
-                Logger.error("cannot handle line type=" + lineType);
-                return null;
-        }
-    }
-
-    public int getCardNumber() {
-        return cardNumber;
-    }
 
     // CardType is enum of publication type of the subject
     public enum CardType {
@@ -79,10 +35,18 @@ public class Card {
     private static String cardAboutTranslator = "כרטיס-אודות-מתרגם-גנזים";
     private static String cardAboutEditor = "כרטיס-אודות-עורך-גנזים";
 
-
     private final CardType cardType;
     private int cardNumber;
+    private LocalDate localDate;
     private String tmpDescriptor = new String("card: ");
+
+    public static boolean isCardHeaderLine(String line) {
+        return (line.startsWith(cardWriter) ||
+                line.startsWith(cardTranslator) ||
+                line.startsWith(cardAboutWriter) ||
+                line.startsWith(cardAboutTranslator) ||
+                line.startsWith(cardAboutEditor));
+    }
 
     public static Card genCard(String header) {
         if (header.startsWith(cardWriter))
@@ -127,6 +91,109 @@ public class Card {
                 Logger.error("no number found in card header <" + cardHeader + ">");
             else
                 this.cardNumber = num;
+        }
+    }
+
+    public String getLineContent(Line.LineType lineType) {
+        switch (lineType) {
+            case NAME:
+                return (nameLine != null) ? nameLine.getContent() : null;
+            case REMARK:
+                return (remarkLine != null) ? remarkLine.getContent() : null;
+            case SOURCE:
+                return (sourceLine != null) ? sourceLine.getContent() : null;
+            case IMPORTANCE:
+                return (importanceLine != null) ? importanceLine.getContent() : null;
+            case PSEUDONYM:
+                return (pseudonymLine != null) ? pseudonymLine.getContent() : null;
+            case CARD:
+                return (cardLine != null) ? cardLine.getContent() : null;
+            case SUB_TITLE:
+                return (subTitleLine != null) ? subTitleLine.getContent() : null;
+            case GREG_DATE:
+                return (gregDateLine != null) ? gregDateLine.getContent() : null;
+            case HEB_DATE:
+                return (hebDateLine != null) ? hebDateLine.getContent() : null;
+            case PAGE:
+                return (pageLine != null) ? pageLine.getContent() : null;
+            case PERSON:
+                return (personLine != null) ? personLine.getContent() : null;
+            case REPORTER:
+                return (reporterLine != null) ? reporterLine.getContent() : null;
+            case SECTION:
+                return (sectionLine != null) ? sectionLine.getContent() : null;
+            default:
+                Logger.error("cannot handle line type=" + lineType);
+                return null;
+        }
+    }
+
+    public int getCardNumber() {
+        return cardNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "nameLine=" + nameLine +
+                ", remarkLine=" + remarkLine +
+                ", sourceLine=" + sourceLine +
+                ", hebDateLine=" + hebDateLine +
+                ", gregDateLine=" + gregDateLine +
+                ", pageLine=" + pageLine +
+                ", pseudonymLine=" + pseudonymLine +
+                ", subTitleLine=" + subTitleLine +
+                ", importanceLine=" + importanceLine +
+                ", reporterLine=" + reporterLine +
+                ", sectionLine=" + sectionLine +
+                ", personLine=" + personLine +
+                ", cardLine=" + cardLine +
+                ", cardType=" + cardType +
+                ", cardNumber=" + cardNumber +
+                ", localDate=" + localDate +
+                ", tmpDescriptor='" + tmpDescriptor + '\'' +
+                '}';
+    }
+
+    public LocalDate getLocalDate() {
+        return localDate;
+    }
+
+    public void setLocalDate(LocalDate localDate) {
+        this.localDate = localDate;
+    }
+
+    public Line getLine(Line.LineType lineType) {
+        switch (lineType) {
+            case NAME:
+                return nameLine;
+            case REMARK:
+                return remarkLine;
+            case SOURCE:
+                return sourceLine;
+            case IMPORTANCE:
+                return importanceLine;
+            case PSEUDONYM:
+                return pseudonymLine;
+            case CARD:
+                return cardLine;
+            case SUB_TITLE:
+                return subTitleLine;
+            case GREG_DATE:
+                return gregDateLine;
+            case HEB_DATE:
+                return hebDateLine;
+            case PAGE:
+                return pageLine;
+            case PERSON:
+                return personLine;
+            case REPORTER:
+                return reporterLine;
+            case SECTION:
+                return sectionLine;
+            default:
+                Logger.error("cannot handle line type=" + lineType);
+                return null;
         }
     }
 
@@ -181,12 +248,4 @@ public class Card {
 
     }
 
-    @Override
-    public String toString() {
-        return "Card{" +
-                "cardType=" + cardType +
-                ", cardNumber=" + cardNumber +
-                ", tmpDescriptor='" + tmpDescriptor + '\'' +
-                '}';
-    }
 }

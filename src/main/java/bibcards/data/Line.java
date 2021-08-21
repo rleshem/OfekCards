@@ -19,6 +19,7 @@ public abstract class Line {
     private final LineType type;
     protected String prefix;
     protected String content;
+    int dataLineNum = 0;
 
     public Line joinContent(Line line, int numLines, int cardNumber) {
         if (content == null) {
@@ -77,7 +78,9 @@ public abstract class Line {
             System.err.println("Unknown line type <" + kind + "> - input line=" + numLines);
             System.exit(-1);
         }
-        return supplier.get();
+        Line line = supplier.get();
+        line.setDataLineNum(numLines);
+        return line;
     }
 
     public Line(LineType type) {
@@ -128,6 +131,14 @@ public abstract class Line {
                     keepLooking = false;
             }
 */
+    }
+
+    public int getDataLineNum() {
+        return dataLineNum;
+    }
+
+    public void setDataLineNum(int dataLineNum) {
+        this.dataLineNum = dataLineNum;
     }
 
     public String getPrefix() {

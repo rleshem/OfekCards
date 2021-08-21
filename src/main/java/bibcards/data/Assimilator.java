@@ -1,5 +1,6 @@
 package bibcards.data;
 
+import bibcards.process.DateProcessor;
 import bibcards.util.Logger;
 import bibcards.util.Setup;
 
@@ -81,10 +82,10 @@ public class Assimilator {
                     return null;
                 }
             }
-            Logger.log(2, "read card at line " + numLines + ": " + nextContentLine);
+            Logger.log(5, "read card at line " + numLines + ": " + nextContentLine);
             fillCard(card);
             cards.add(card);
-            Logger.log(2, "filled card no. " + cards.size() + " - reached line " + numLines + ", next line: " + nextContentLine);
+            Logger.log(5, "filled card no. " + cards.size() + " - reached line " + numLines + ", next line: " + nextContentLine);
             if (fileExhausted) {
                 Logger.log(1, "File exhausted, read " + cards.size() + " cards, stored in " + numLines + " data lines");
                 return cards;
@@ -99,7 +100,8 @@ public class Assimilator {
                 if (fileExhausted)
                     return;
                 if (Card.isCardHeaderLine(nextContentLine)) {
-                    Logger.log(4, "filled card <" + card.toString() + ">");
+                    Logger.log(5, "filled card <" + card.toString() + ">");
+                    DateProcessor.getDateProcessor().processCard(card);
                     return;
                 }
             } catch (IOException e) {
@@ -142,8 +144,14 @@ public class Assimilator {
     public static void main(String[] args) throws IOException {
         Assimilator assimilator = Assimilator.getAssimilator();
         List<Card> cards = assimilator.readCards();
-        for (Card card : cards) {
-            Logger.log(3, "card=" + card.getCardNumber() + ": name=" + card.getLineContent(Line.LineType.NAME) + ", source=" + card.getLineContent(Line.LineType.SOURCE) + ", importance=" + card.getLineContent(Line.LineType.IMPORTANCE));
+        DateProcessor.getDateProcessor().dumpSummary();
+        int i = 0;
+        if (Setup.getSetup().getBooleanProperty(Setup.dumpCards)) {
+            for (Card card : cards) {
+                Logger.log(4, "card=" + card.getCardNumber() + ": name=" + card.getLineContent(Line.LineType.NAME) + ", source=" + card.getLineContent(Line.LineType.SOURCE) + ", importance=" + card.getLineContent(Line.LineType.IMPORTANCE));
+                if ((i++ % 50) == 0)
+                    Logger.log(4, "### " + card.toString());
+            }
         }
         assimilator.dumpMaxLineLength();
         Logger.log(1, "read " + cards.size() + " from file <" + assimilator.getFileName() + ">");
