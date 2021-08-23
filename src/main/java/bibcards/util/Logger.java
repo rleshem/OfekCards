@@ -106,4 +106,9 @@ public class Logger {
         }
         System.err.println(errorMessage);
     }
+
+    public static void flush() throws IOException {
+        logWriter.flush();
+        errorWriter.flush();
+    }
 }

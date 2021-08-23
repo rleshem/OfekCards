@@ -1,10 +1,36 @@
 package bibcards.data;
 
+import bibcards.data.line.*;
 import bibcards.util.Logger;
 
 import java.time.LocalDate;
 
 public class Card {
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "nameLine=" + nameLine +
+                ", remarkLine=" + remarkLine +
+                ", sourceLine=" + sourceLine +
+                ", hebDateLine=" + hebDateLine +
+                ", gregDateLine=" + gregDateLine +
+                ", pageLine=" + pageLine +
+                ", pseudonymLine=" + pseudonymLine +
+                ", subTitleLine=" + subTitleLine +
+                ", importanceLine=" + importanceLine +
+                ", reporterLine=" + reporterLine +
+                ", sectionLine=" + sectionLine +
+                ", personLine=" + personLine +
+                ", manualGregDateLine=" + manualGregDateLine +
+                ", manualHebDateLine=" + manualHebDateLine +
+                ", cardLine=" + cardLine +
+                ", cardType=" + cardType +
+                ", cardNumber=" + cardNumber +
+                ", localDate=" + localDate +
+                ", tmpDescriptor='" + tmpDescriptor + '\'' +
+                '}';
+    }
 
     // CardType is enum of publication type of the subject
     public enum CardType {
@@ -27,6 +53,8 @@ public class Card {
     private ReporterLine reporterLine = null;
     private SectionLine sectionLine = null;
     private PersonLine personLine = null;
+    private ManualGregDateLine manualGregDateLine = null;
+    private ManualHebDateLine manualHebDateLine = null;
     private CardLine cardLine = null;
 
     private static String cardWriter = "כרטיס-כותב-גנזים";
@@ -40,13 +68,7 @@ public class Card {
     private LocalDate localDate;
     private String tmpDescriptor = new String("card: ");
 
-    public static boolean isCardHeaderLine(String line) {
-        return (line.startsWith(cardWriter) ||
-                line.startsWith(cardTranslator) ||
-                line.startsWith(cardAboutWriter) ||
-                line.startsWith(cardAboutTranslator) ||
-                line.startsWith(cardAboutEditor));
-    }
+
 
     public static Card genCard(String header) {
         if (header.startsWith(cardWriter))
@@ -63,10 +85,17 @@ public class Card {
             throw new IllegalArgumentException("unknown card header <" + header + ">");
     }
 
+    public static boolean isCardHeaderLine(String line) {
+        return (line.startsWith(cardWriter) ||
+                line.startsWith(cardTranslator) ||
+                line.startsWith(cardAboutWriter) ||
+                line.startsWith(cardAboutTranslator) ||
+                line.startsWith(cardAboutEditor));
+    }
+
     public Card(CardType cardType, String cardHeader) {
         this.cardType = cardType;
         this.cardLine = new CardLine();
-//        this.cardLine.setContent(cardHeader);
 
         // get card number from cardHeader
         String[] parts = cardHeader.split(" ");
@@ -122,6 +151,10 @@ public class Card {
                 return (reporterLine != null) ? reporterLine.getContent() : null;
             case SECTION:
                 return (sectionLine != null) ? sectionLine.getContent() : null;
+            case MANUAL_GREG_DATE:
+                return (manualGregDateLine != null) ? manualGregDateLine.getContent() : null;
+            case MANUAL_HEB_DATE:
+                return (manualHebDateLine != null) ? manualHebDateLine.getContent() : null;
             default:
                 Logger.error("cannot handle line type=" + lineType);
                 return null;
@@ -132,27 +165,12 @@ public class Card {
         return cardNumber;
     }
 
-    @Override
-    public String toString() {
-        return "Card{" +
-                "nameLine=" + nameLine +
-                ", remarkLine=" + remarkLine +
-                ", sourceLine=" + sourceLine +
-                ", hebDateLine=" + hebDateLine +
-                ", gregDateLine=" + gregDateLine +
-                ", pageLine=" + pageLine +
-                ", pseudonymLine=" + pseudonymLine +
-                ", subTitleLine=" + subTitleLine +
-                ", importanceLine=" + importanceLine +
-                ", reporterLine=" + reporterLine +
-                ", sectionLine=" + sectionLine +
-                ", personLine=" + personLine +
-                ", cardLine=" + cardLine +
-                ", cardType=" + cardType +
-                ", cardNumber=" + cardNumber +
-                ", localDate=" + localDate +
-                ", tmpDescriptor='" + tmpDescriptor + '\'' +
-                '}';
+    public void setCardHeaderLineNumber(int linNum) {
+        cardLine.setDataLineNum(linNum);
+    }
+
+    public int getCardHeaderLineNumber() {
+        return cardLine.getDataLineNum();
     }
 
     public LocalDate getLocalDate() {
@@ -191,6 +209,10 @@ public class Card {
                 return reporterLine;
             case SECTION:
                 return sectionLine;
+            case MANUAL_GREG_DATE:
+                return manualGregDateLine;
+            case MANUAL_HEB_DATE:
+                return manualHebDateLine;
             default:
                 Logger.error("cannot handle line type=" + lineType);
                 return null;
@@ -235,8 +257,14 @@ public class Card {
             case PERSON:
                 this.personLine = (personLine == null) ? (PersonLine) line : (PersonLine) personLine.joinContent(line, numLines, cardNumber);
                 break;
+            case MANUAL_GREG_DATE:
+                this.manualGregDateLine = (manualGregDateLine == null) ? (ManualGregDateLine) line : (ManualGregDateLine) manualGregDateLine.joinContent(line, numLines, cardNumber);
+                break;
+            case MANUAL_HEB_DATE:
+                this.manualHebDateLine = (manualHebDateLine == null) ? (ManualHebDateLine) line : (ManualHebDateLine) manualHebDateLine.joinContent(line, numLines, cardNumber);
+                break;
             case CARD:
-                Logger.error("card " + this.cardNumber + " of type <" + this.cardType + "> - cannot accept another card line=<" + line.toString() + ">");
+                Logger.error("card " + this.cardNumber + " at line " + line.getDataLineNum() + " of type <" + this.cardType + "> - cannot accept another card line=<" + line.toString() + ">");
                 break;
             default:
                 Logger.error("card " + this.cardNumber + " of type <" + this.cardType + "> - unknown type of line=<" + line.toString() + ">");

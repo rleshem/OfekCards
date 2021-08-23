@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +61,7 @@ public class Assimilator {
             // skip empty lines or lines starting with comment character
             if (line.length() < 1)  // skip empty lines
                 continue;
-            if (line.startsWith(commentChar)) // skip comment lines
+            if (line.endsWith(commentChar) || line.startsWith(commentChar)) // skip comment lines
                 continue;
             return line;
         }
@@ -94,6 +95,7 @@ public class Assimilator {
     }
 
     private void fillCard(Card card) {
+        card.setCardHeaderLineNumber(numLines);
         while (true) {
             try {
                 nextContentLine = readContentLine();
@@ -101,26 +103,28 @@ public class Assimilator {
                     return;
                 if (Card.isCardHeaderLine(nextContentLine)) {
                     Logger.log(5, "filled card <" + card.toString() + ">");
-                    DateProcessor.getDateProcessor().processCard(card);
+                    LocalDate localDate = DateProcessor.getDateProcessor().processCardDate(card);
+                    if (localDate == null) {
+                        Logger.error("no date found in card " + card.getCardNumber() + " at line " + card.getCardHeaderLineNumber());
+                    } else {
+                        card.setLocalDate(localDate);
+                        Logger.log(1, "date=" + DateProcessor.getDateProcessor().presentableDate(localDate) + " in card " + card.getCardNumber());
+                    }
                     return;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            // look for Xi lines, such as "ת1: בלה"
-            int splitterPos = nextContentLine.indexOf(':');
-            String linePrefix = nextContentLine.substring(0, splitterPos);
-            if (linePrefix.length() > 1) {
-                Logger.error("found Xi line, line number=" + numLines);
-            }
-            // look till here
+
             String prefixOfLine = nextContentLine.substring(0, 1);
             Line line = Line.createLineOf(prefixOfLine, numLines);
-            line.setContent(nextContentLine);
             if (line == null) {
                 Logger.error("line type not identified, line=<" + nextContentLine + ">");
             } else {
+                line.setContent(nextContentLine);
                 card.addLine(line, numLines);
+
+                // check if current line is longer than previous lines of the same type
                 Integer currMax =maxLineLenMap.get(line.getType());
                 int currMaxLen = (currMax == null) ? 0 : maxLineLenMap.get(line.getType()).intValue();
                 if (currMaxLen < line.getContent().length())

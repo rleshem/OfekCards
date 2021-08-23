@@ -1,4 +1,6 @@
-package bibcards.data;
+package bibcards.data.line;
+
+import bibcards.data.Line;
 
 public class HebDateLine extends Line {
     public HebDateLine() {
