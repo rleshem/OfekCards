@@ -1,6 +1,6 @@
-package bibcards.data;
+package bibcards.input;
 
-import bibcards.data.line.*;
+import bibcards.input.line.*;
 import bibcards.util.Logger;
 
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public abstract class Line {
     int dataLineNum = 0;
 
     public enum LineType {
-        NAME,               // ש (שם)
+        TITLE,              // ש (כותרת)
         REMARK,             // ה (הערה)
         SOURCE,             // מ (מקור)
         HEB_DATE,           // ע (עברי)
@@ -32,14 +32,8 @@ public abstract class Line {
         CARD        // כ (כרטיס-גנזים)
     }
 
-    /*
-    private static Map<String, LineType> typesByKey = new HashMap<String, LineType>() {{
-        put("ש", LineType.Name);
-        put("ה", LineType.Remark);
-    }};
-     */
     private static Map<String, Supplier<Line>> typeSupplierMap = new HashMap<String, Supplier<Line>>() {{
-        put("ש", NameLine::new);
+        put("ש", TitleLine::new);
         put("ה", RemarkLine::new);
         put("מ", SourceLine::new);
         put("ע", HebDateLine::new);

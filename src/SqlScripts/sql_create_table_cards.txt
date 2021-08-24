@@ -1,0 +1,27 @@
+CREATE TABLE cards (
+
+    id INTEGER PRIMARY KEY,
+    type TEXT,
+
+    title TEXT,
+    sub_title TEXT,
+
+    source TEXT,
+    section TEXT,
+    page TEXT,
+    pseudonym TEXT,
+    reporter TEXT,
+
+    remark TEXT,
+
+    greg_date TEXT,
+    man_greg_date TEXT,
+    heb_date TEXT,
+    man_heb_date TEXT,
+    canonized_date TEXT,
+
+    importance TEXT,
+    person TEXT,
+    card TEXT
+
+);

@@ -1,7 +1,7 @@
 package bibcards.process;
 
-import bibcards.data.Card;
-import bibcards.data.Line;
+import bibcards.input.Card;
+import bibcards.input.Line;
 import bibcards.util.Logger;
 import bibcards.util.Setup;
 
@@ -67,7 +67,10 @@ public class DateProcessor {
     }
 
     private LocalDate getLocalDateFromGregDate(Line lineWithDate) {
-        String usableGregDateString = lineWithDate.getContent().trim();
+        return getLocalDateFromString(lineWithDate.getContent().trim(), lineWithDate.getDataLineNum());
+    }
+
+    public LocalDate getLocalDateFromString(String usableGregDateString, int lineNumber) {
         LocalDate localDate = null;
         String paddedDateString = null;
 
@@ -89,17 +92,17 @@ public class DateProcessor {
 
         try {
             localDate = LocalDate.parse(paddedDateString, dateTimeFormatter);
-            Logger.log(4, "parsed OK date <" + paddedDateString + "> at data line=" + lineWithDate.getDataLineNum());
+            Logger.log(4, "parsed OK date <" + paddedDateString + "> at input line=" + lineNumber);
             if (localDate.getYear() > maxGregYear) {
                 localDate = localDate.minusYears(100);
                 Logger.log(1, "date reduced to <" + paddedDateString + ">");
             }
             okParses++;
-            Logger.log(1, lineWithDate.getDataLineNum() + ": got OK date <" + presentableDate(localDate) + ">");
+            Logger.log(1, lineNumber + ": got OK date <" + presentableDate(localDate) + ">");
             return localDate;
         } catch (Exception e) {
             failedParses++;
-            Logger.error(lineWithDate.getDataLineNum() + ": failed on date <" + paddedDateString + ">");
+            Logger.error(lineNumber + ": failed on date <" + paddedDateString + ">");
             return null;
         }
     }

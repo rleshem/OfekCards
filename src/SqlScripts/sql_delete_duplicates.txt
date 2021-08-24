@@ -1,0 +1,31 @@
+/* SELECT DISTINCT [col1],[col2],[col3],[col4],[col5],[col6],[col7]
+/*
+/* INTO [newTable]
+
+SELECT DISTINCT
+    [uuid],
+    [first_name],
+    [last_name],
+    [full_name],
+    [father_name],
+    [mother_name],
+    [children_identified],
+    [life_story],
+    [matched_lifestory_words],
+    [age],
+    [death_year],
+    [death_month],
+    [death_day],
+    [death_date],
+    [hebrew_death_date],
+    [rank],
+    [gender],
+    [religion],
+    [is_mia],
+    [is_last_of_kin],
+    [cemetery],
+    [decorations_content],
+    [monument_list],
+    [service_type],
+    [service_org]
+INTO [tmp];

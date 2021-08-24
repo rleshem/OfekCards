@@ -9,11 +9,13 @@ import java.util.Properties;
 
 public class Setup {
 
+    public static String dbProp = "db";
     public static String logProp = "log";
     public static String logOutput = "log_output";
     public static String dataFile = "data_file";
     public static String dumpCards = "dump_cards";
     public static String maxGregorianYear = "max_gregorian_year";
+    public static String numStoreCardsProp = "num_store_cards";
 
     /*
         public static String dbProp = "db";

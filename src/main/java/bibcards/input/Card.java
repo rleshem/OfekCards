@@ -1,16 +1,17 @@
-package bibcards.data;
+package bibcards.input;
 
-import bibcards.data.line.*;
+import bibcards.input.line.*;
 import bibcards.util.Logger;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Card {
 
     @Override
     public String toString() {
         return "Card{" +
-                "nameLine=" + nameLine +
+                "titleLine=" + titleLine +
                 ", remarkLine=" + remarkLine +
                 ", sourceLine=" + sourceLine +
                 ", hebDateLine=" + hebDateLine +
@@ -27,7 +28,7 @@ public class Card {
                 ", cardLine=" + cardLine +
                 ", cardType=" + cardType +
                 ", cardNumber=" + cardNumber +
-                ", localDate=" + localDate +
+                ", localDate=" + canonizedDate +
                 ", tmpDescriptor='" + tmpDescriptor + '\'' +
                 '}';
     }
@@ -41,14 +42,14 @@ public class Card {
         ABOUT_EDITOR,       // card detailing publication about subject as editor
     }
 
-    private NameLine nameLine = null;
+    private TitleLine titleLine = null;
+    private SubTitleLine subTitleLine = null;
     private RemarkLine remarkLine = null;
     private SourceLine sourceLine = null;
     private HebDateLine hebDateLine = null;
     private GregDateLine gregDateLine = null;
     private PageLine pageLine = null;
     private PseudonymLine pseudonymLine = null;
-    private SubTitleLine subTitleLine = null;
     private ImportanceLine importanceLine = null;
     private ReporterLine reporterLine = null;
     private SectionLine sectionLine = null;
@@ -65,10 +66,23 @@ public class Card {
 
     private final CardType cardType;
     private int cardNumber;
-    private LocalDate localDate;
+    private LocalDate canonizedDate;
     private String tmpDescriptor = new String("card: ");
 
-
+    public static Card genCardByType(String typeOfCard) {
+        if (typeOfCard.equals(CardType.WRITER))
+            return new Card(CardType.WRITER);
+        else if (typeOfCard.equals(CardType.TRANSLATOR))
+            return new Card(CardType.TRANSLATOR);
+        else if (typeOfCard.equals(CardType.ABOUT_WRITER))
+            return new Card(CardType.ABOUT_WRITER);
+        else if (typeOfCard.equals(CardType.ABOUT_TRANSLATOR))
+            return new Card(CardType.ABOUT_TRANSLATOR);
+        else if (typeOfCard.equals(CardType.ABOUT_EDITOR))
+            return new Card(CardType.ABOUT_EDITOR);
+        else
+            throw new IllegalArgumentException("unknown card type <" + typeOfCard + ">");
+    }
 
     public static Card genCard(String header) {
         if (header.startsWith(cardWriter))
@@ -93,7 +107,12 @@ public class Card {
                 line.startsWith(cardAboutEditor));
     }
 
-    public Card(CardType cardType, String cardHeader) {
+    private Card(CardType cardType) {
+        this.cardType = cardType;
+        this.cardLine = null;
+    }
+
+    private Card(CardType cardType, String cardHeader) {
         this.cardType = cardType;
         this.cardLine = new CardLine();
 
@@ -125,8 +144,8 @@ public class Card {
 
     public String getLineContent(Line.LineType lineType) {
         switch (lineType) {
-            case NAME:
-                return (nameLine != null) ? nameLine.getContent() : null;
+            case TITLE:
+                return (titleLine != null) ? titleLine.getContent() : null;
             case REMARK:
                 return (remarkLine != null) ? remarkLine.getContent() : null;
             case SOURCE:
@@ -165,6 +184,10 @@ public class Card {
         return cardNumber;
     }
 
+    public CardType getCardType() {
+        return cardType;
+    }
+
     public void setCardHeaderLineNumber(int linNum) {
         cardLine.setDataLineNum(linNum);
     }
@@ -173,18 +196,35 @@ public class Card {
         return cardLine.getDataLineNum();
     }
 
-    public LocalDate getLocalDate() {
-        return localDate;
+    private static DateTimeFormatter readableFormatter = DateTimeFormatter.ofPattern("dd-MM-yy");
+
+    public String getCanonizedDate() {
+        if (canonizedDate == null) {
+            Logger.error("card " + cardNumber + ": no canonizedDate");
+            return cardNumber + ": ~no canonized date~";
+        }
+
+        int month = canonizedDate.getMonthValue();
+        String monthValue = (month < 10) ? "0" + String.valueOf(month) : String.valueOf(month);
+        int day = canonizedDate.getDayOfMonth();
+        String dayValue = (day < 10) ? "0" + String.valueOf(day) : String.valueOf(day);
+
+        String byYearMonthDayDateString =
+                canonizedDate.getYear() + "-" +
+                        monthValue + "-" +
+                        dayValue;
+//        String formattedDate = canonizedDate.format(readableFormatter);
+        return byYearMonthDayDateString;
     }
 
-    public void setLocalDate(LocalDate localDate) {
-        this.localDate = localDate;
+    public void setCanonizedDate(LocalDate canonizedDate) {
+        this.canonizedDate = canonizedDate;
     }
 
     public Line getLine(Line.LineType lineType) {
         switch (lineType) {
-            case NAME:
-                return nameLine;
+            case TITLE:
+                return titleLine;
             case REMARK:
                 return remarkLine;
             case SOURCE:
@@ -219,16 +259,21 @@ public class Card {
         }
     }
 
+    public void addLine(Line line) {
+        this.addLine(line, -1);
+    }
+
     public void addLine(Line line, int numLines) {
         switch (line.getType()) {
-            case NAME:
-                nameLine = (nameLine == null) ? (NameLine) line : (NameLine) nameLine.joinContent(line, numLines, cardNumber);
+            case TITLE:
+                titleLine = (titleLine == null) ? (TitleLine) line : (TitleLine) titleLine.joinContent(line, numLines, cardNumber);
                 break;
             case REMARK:
                 this.remarkLine = (remarkLine == null) ? (RemarkLine) line : (RemarkLine) remarkLine.joinContent(line, numLines, cardNumber);
                 break;
             case SOURCE:
-                this.sourceLine = (sourceLine == null) ? (SourceLine) line : (SourceLine) sourceLine.joinContent(line, numLines, cardNumber);;
+                this.sourceLine = (sourceLine == null) ? (SourceLine) line : (SourceLine) sourceLine.joinContent(line, numLines, cardNumber);
+                ;
                 break;
             case HEB_DATE:
                 this.hebDateLine = (hebDateLine == null) ? (HebDateLine) line : (HebDateLine) hebDateLine.joinContent(line, numLines, cardNumber);

@@ -1,5 +1,6 @@
-package bibcards.data;
+package bibcards.input;
 
+import bibcards.output.SqliteHandler;
 import bibcards.process.DateProcessor;
 import bibcards.util.Logger;
 import bibcards.util.Setup;
@@ -85,10 +86,21 @@ public class Assimilator {
             }
             Logger.log(5, "read card at line " + numLines + ": " + nextContentLine);
             fillCard(card);
+
+            // calculate the canonized date for card
+            Logger.log(5, "filled card <" + card.toString() + ">");
+            LocalDate localDate = DateProcessor.getDateProcessor().processCardDate(card);
+            if (localDate == null) {
+                Logger.error("no date found in card " + card.getCardNumber() + " at line " + card.getCardHeaderLineNumber());
+            } else {
+                card.setCanonizedDate(localDate);
+                Logger.log(1, "date=" + DateProcessor.getDateProcessor().presentableDate(localDate) + " in card " + card.getCardNumber());
+            }
+
             cards.add(card);
             Logger.log(5, "filled card no. " + cards.size() + " - reached line " + numLines + ", next line: " + nextContentLine);
             if (fileExhausted) {
-                Logger.log(1, "File exhausted, read " + cards.size() + " cards, stored in " + numLines + " data lines");
+                Logger.log(1, "File exhausted, read " + cards.size() + " cards, stored in " + numLines + " input lines");
                 return cards;
             }
         }
@@ -101,17 +113,20 @@ public class Assimilator {
                 nextContentLine = readContentLine();
                 if (fileExhausted)
                     return;
-                if (Card.isCardHeaderLine(nextContentLine)) {
-                    Logger.log(5, "filled card <" + card.toString() + ">");
-                    LocalDate localDate = DateProcessor.getDateProcessor().processCardDate(card);
-                    if (localDate == null) {
-                        Logger.error("no date found in card " + card.getCardNumber() + " at line " + card.getCardHeaderLineNumber());
-                    } else {
-                        card.setLocalDate(localDate);
-                        Logger.log(1, "date=" + DateProcessor.getDateProcessor().presentableDate(localDate) + " in card " + card.getCardNumber());
-                    }
+                if (Card.isCardHeaderLine(nextContentLine))
                     return;
-                }
+
+//                if (Card.isCardHeaderLine(nextContentLine)) {
+//                    Logger.log(5, "filled card <" + card.toString() + ">");
+//                    LocalDate localDate = DateProcessor.getDateProcessor().processCardDate(card);
+//                    if (localDate == null) {
+//                        Logger.error("no date found in card " + card.getCardNumber() + " at line " + card.getCardHeaderLineNumber());
+//                    } else {
+//                        card.setCanonizedDate(localDate);
+//                        Logger.log(1, "date=" + DateProcessor.getDateProcessor().presentableDate(localDate) + " in card " + card.getCardNumber());
+//                    }
+//                    return;
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -125,7 +140,7 @@ public class Assimilator {
                 card.addLine(line, numLines);
 
                 // check if current line is longer than previous lines of the same type
-                Integer currMax =maxLineLenMap.get(line.getType());
+                Integer currMax = maxLineLenMap.get(line.getType());
                 int currMaxLen = (currMax == null) ? 0 : maxLineLenMap.get(line.getType()).intValue();
                 if (currMaxLen < line.getContent().length())
                     maxLineLenMap.put(line.getType(), line.getContent().length());
@@ -152,13 +167,22 @@ public class Assimilator {
         int i = 0;
         if (Setup.getSetup().getBooleanProperty(Setup.dumpCards)) {
             for (Card card : cards) {
-                Logger.log(4, "card=" + card.getCardNumber() + ": name=" + card.getLineContent(Line.LineType.NAME) + ", source=" + card.getLineContent(Line.LineType.SOURCE) + ", importance=" + card.getLineContent(Line.LineType.IMPORTANCE));
+                Logger.log(4, "card=" + card.getCardNumber() + ": name=" + card.getLineContent(Line.LineType.TITLE) + ", source=" + card.getLineContent(Line.LineType.SOURCE) + ", importance=" + card.getLineContent(Line.LineType.IMPORTANCE));
                 if ((i++ % 50) == 0)
                     Logger.log(4, "### " + card.toString());
             }
         }
         assimilator.dumpMaxLineLength();
         Logger.log(1, "read " + cards.size() + " from file <" + assimilator.getFileName() + ">");
+
+        int numStoreCards = Setup.getSetup().getIntProperty(Setup.numStoreCardsProp);
+        if (numStoreCards < 1) {
+            SqliteHandler.getHandler().insertListOfCards(cards, false);
+        } else {
+            for (int j = 0; j < numStoreCards; j++) {
+                SqliteHandler.getHandler().insertCard(cards.get(j), false);
+            }
+        }
     }
 
 }

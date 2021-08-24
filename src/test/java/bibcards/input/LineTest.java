@@ -1,6 +1,5 @@
-package bibcards.data;
+package bibcards.input;
 
-import bibcards.util.Logger;
 import org.junit.jupiter.api.Test;
 
 class LineTest {
