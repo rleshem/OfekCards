@@ -16,6 +16,7 @@ public class FieldConstants {
     public static final String FIELD_SUB_TITLE = "sub_title";
 
     public static final String FIELD_SOURCE = "source";
+    public static final String FIELD_VOLUME = "volume";
     public static final String FIELD_SECTION = "section";
     public static final String FIELD_PAGE = "page";
     public static final String FIELD_PSEUDONYM = "pseudonym";

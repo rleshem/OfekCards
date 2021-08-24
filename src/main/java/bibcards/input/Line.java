@@ -2,9 +2,9 @@ package bibcards.input;
 
 import bibcards.input.line.*;
 import bibcards.util.Logger;
+import bibcards.util.Setup;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 public abstract class Line {
@@ -12,6 +12,8 @@ public abstract class Line {
     private final LineType type;
     protected String prefix;
     protected String content;
+    protected boolean trimPunctuationChars = false;
+    private boolean propsLoaded = false;
     int dataLineNum = 0;
 
     public enum LineType {
@@ -29,25 +31,27 @@ public abstract class Line {
         PERSON,             // (אישיות) א
         MANUAL_GREG_DATE,   // ג (תאריך לועזי מתוקנן)
         MANUAL_HEB_DATE,    // ב (תאריך עברי מתוקנן)
+        VOLUME,             //צ (כרך \ גיליון \ שנה \ וכו' )
         CARD        // כ (כרטיס-גנזים)
     }
 
     private static Map<String, Supplier<Line>> typeSupplierMap = new HashMap<String, Supplier<Line>>() {{
-        put("ש", TitleLine::new);
-        put("ה", RemarkLine::new);
-        put("מ", SourceLine::new);
-        put("ע", HebDateLine::new);
-        put("ל", GregDateLine::new);
-        put("ד", PageLine::new);
-        put("ט", PseudonymLine::new);
-        put("ת", SubTitleLine::new);
-        put("ח", ImportanceLine::new);
-        put("ר", ReporterLine::new);
-        put("ס", SectionLine::new);
         put("א", PersonLine::new);
-        put("כ", CardLine::new);
-        put("ג", ManualGregDateLine::new);
         put("ב", ManualHebDateLine::new);
+        put("ג", ManualGregDateLine::new);
+        put("ד", PageLine::new);
+        put("ה", RemarkLine::new);
+        put("ח", ImportanceLine::new);
+        put("ט", PseudonymLine::new);
+        put("כ", CardLine::new);
+        put("ל", GregDateLine::new);
+        put("מ", SourceLine::new);
+        put("ס", SectionLine::new);
+        put("ע", HebDateLine::new);
+        put("צ", VolumeLine::new);
+        put("ר", ReporterLine::new);
+        put("ש", TitleLine::new);
+        put("ת", SubTitleLine::new);
     }};
 
     public static Line createLineOf(String kind, int numLines) {
@@ -86,6 +90,8 @@ public abstract class Line {
     }
 
     public void setContent(String inputLine) {
+        if (!propsLoaded)
+            loadProperties();
         if (!inputLine.contains(":")) {
             Logger.error("line no. " +
                     Assimilator.getAssimilator().getNumLines() + " has no ':' character - cannot process");
@@ -95,7 +101,12 @@ public abstract class Line {
         // skip spaces after ':'
         while (inputLine.charAt(dividerPos) == ' ')
             dividerPos++;
-        this.content = inputLine.substring(dividerPos);
+        this.content = inputLine.substring(dividerPos).trim();
+    }
+
+    protected void loadProperties() {
+        trimPunctuationChars = Setup.getSetup().getBooleanProperty(Setup.trimPunctuationCharsProp);
+        propsLoaded = true;
     }
 
     public int getDataLineNum() {
@@ -110,7 +121,9 @@ public abstract class Line {
         return prefix;
     }
 
-    public boolean isCanBeMulti() { return false; }
+    public boolean isCanBeMulti() {
+        return false;
+    }
 
     @Override
     public String toString() {

@@ -56,6 +56,7 @@ public class Card {
     private PersonLine personLine = null;
     private ManualGregDateLine manualGregDateLine = null;
     private ManualHebDateLine manualHebDateLine = null;
+    private VolumeLine volumeLine = null;
     private CardLine cardLine = null;
 
     private static String cardWriter = "כרטיס-כותב-גנזים";
@@ -174,6 +175,8 @@ public class Card {
                 return (manualGregDateLine != null) ? manualGregDateLine.getContent() : null;
             case MANUAL_HEB_DATE:
                 return (manualHebDateLine != null) ? manualHebDateLine.getContent() : null;
+            case VOLUME:
+                return (volumeLine != null) ? volumeLine.getContent() : null;
             default:
                 Logger.error("cannot handle line type=" + lineType);
                 return null;
@@ -253,6 +256,8 @@ public class Card {
                 return manualGregDateLine;
             case MANUAL_HEB_DATE:
                 return manualHebDateLine;
+            case VOLUME:
+                return volumeLine;
             default:
                 Logger.error("cannot handle line type=" + lineType);
                 return null;
@@ -307,6 +312,9 @@ public class Card {
                 break;
             case MANUAL_HEB_DATE:
                 this.manualHebDateLine = (manualHebDateLine == null) ? (ManualHebDateLine) line : (ManualHebDateLine) manualHebDateLine.joinContent(line, numLines, cardNumber);
+                break;
+            case VOLUME:
+                this.volumeLine = (volumeLine == null) ? (VolumeLine) line : (VolumeLine) volumeLine.joinContent(line, numLines, cardNumber);
                 break;
             case CARD:
                 Logger.error("card " + this.cardNumber + " at line " + line.getDataLineNum() + " of type <" + this.cardType + "> - cannot accept another card line=<" + line.toString() + ">");

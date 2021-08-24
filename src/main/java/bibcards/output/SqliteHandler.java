@@ -38,24 +38,25 @@ public class SqliteHandler {
                 FIELD_SUB_TITLE + "," +         // 4
 
                 FIELD_SOURCE + "," +            // 5
-                FIELD_SECTION + "," +           // 6
-                FIELD_PAGE + "," +              // 7
-                FIELD_PSEUDONYM + "," +         // 8
-                FIELD_REPORTER + "," +          // 9
+                FIELD_VOLUME + "," +            // 6
+                FIELD_SECTION + "," +           // 7
+                FIELD_PAGE + "," +              // 8
+                FIELD_PSEUDONYM + "," +         // 9
+                FIELD_REPORTER + "," +          // 10
 
-                FIELD_REMARK + "," +            // 10
+                FIELD_REMARK + "," +            // 11
 
-                FIELD_GREG_DATE + "," +         // 11
-                FIELD_MAN_GREG_DATE + "," +     // 12
-                FIELD_HEB_DATE + "," +          // 13
-                FIELD_MAN_HEB_DATE + "," +      // 14
-                FIELD_CANONIZED_DATE + "," +    // 15
+                FIELD_GREG_DATE + "," +         // 12
+                FIELD_MAN_GREG_DATE + "," +     // 13
+                FIELD_HEB_DATE + "," +          // 14
+                FIELD_MAN_HEB_DATE + "," +      // 15
+                FIELD_CANONIZED_DATE + "," +    // 16
 
-                FIELD_IMPORTANCE + "," +        // 16
-                FIELD_PERSON + "," +            // 17
-                FIELD_CARD +                    // 18
+                FIELD_IMPORTANCE + "," +        // 17
+                FIELD_PERSON + "," +            // 18
+                FIELD_CARD +                    // 19
 
-                ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     }
 
     private SqliteHandler(String... dbNameOptional) {
@@ -155,19 +156,20 @@ public class SqliteHandler {
             statement.setString(3, card.getLineContent(Line.LineType.TITLE));
             statement.setString(4, card.getLineContent(Line.LineType.SUB_TITLE));
             statement.setString(5, card.getLineContent(Line.LineType.SOURCE));
-            statement.setString(6, card.getLineContent(Line.LineType.SECTION));
-            statement.setString(7, card.getLineContent(Line.LineType.PAGE));
-            statement.setString(8, card.getLineContent(Line.LineType.PSEUDONYM));
-            statement.setString(9, card.getLineContent(Line.LineType.REPORTER));
-            statement.setString(10, card.getLineContent(Line.LineType.REMARK));
-            statement.setString(11, card.getLineContent(Line.LineType.GREG_DATE));
-            statement.setString(12, card.getLineContent(Line.LineType.MANUAL_GREG_DATE));
-            statement.setString(13, card.getLineContent(Line.LineType.HEB_DATE));
-            statement.setString(14, card.getLineContent(Line.LineType.MANUAL_HEB_DATE));
-            statement.setString(15, card.getCanonizedDate());
-            statement.setString(16, card.getLineContent(Line.LineType.IMPORTANCE));
-            statement.setString(17, card.getLineContent(Line.LineType.PERSON));
-            statement.setString(18, card.getLineContent(Line.LineType.CARD));
+            statement.setString(6, card.getLineContent(Line.LineType.VOLUME));
+            statement.setString(7, card.getLineContent(Line.LineType.SECTION));
+            statement.setString(8, card.getLineContent(Line.LineType.PAGE));
+            statement.setString(9, card.getLineContent(Line.LineType.PSEUDONYM));
+            statement.setString(10, card.getLineContent(Line.LineType.REPORTER));
+            statement.setString(11, card.getLineContent(Line.LineType.REMARK));
+            statement.setString(12, card.getLineContent(Line.LineType.GREG_DATE));
+            statement.setString(13, card.getLineContent(Line.LineType.MANUAL_GREG_DATE));
+            statement.setString(14, card.getLineContent(Line.LineType.HEB_DATE));
+            statement.setString(15, card.getLineContent(Line.LineType.MANUAL_HEB_DATE));
+            statement.setString(16, card.getCanonizedDate());
+            statement.setString(17, card.getLineContent(Line.LineType.IMPORTANCE));
+            statement.setString(18, card.getLineContent(Line.LineType.PERSON));
+            statement.setString(19, card.getLineContent(Line.LineType.CARD));
 
             result = statement.executeUpdate();
         } catch (SQLException e) {

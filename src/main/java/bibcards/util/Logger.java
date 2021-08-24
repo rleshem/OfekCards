@@ -100,11 +100,11 @@ public class Logger {
         if (!initialized)
             initLogs();
         try {
-            errorWriter.write(errorMessage + "\n");
+            errorWriter.write("### " + errorMessage + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.err.println(errorMessage);
+        System.err.println("### " + errorMessage);
     }
 
     public static void flush() throws IOException {
