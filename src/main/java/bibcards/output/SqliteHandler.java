@@ -20,7 +20,7 @@ public class SqliteHandler {
 
     protected static String jdbcPrefix = "jdbc:sqlite:";
     private static SqliteHandler sqliteHandler = null;
-    private Connection database = null;
+    private Connection database;
     private String sqlInsertCard;
 
     public static SqliteHandler getHandler(String... dbNameOptional) {
@@ -34,26 +34,29 @@ public class SqliteHandler {
                 FIELD_CARD_ID + "," +           // 1
                 FIELD_TYPE + "," +              // 2
 
-                FIELD_TITLE + "," +             // 3
-                FIELD_SUB_TITLE + "," +         // 4
+                FIELD_SOURCE + "," +            // 3
+                FIELD_CANONIZED_DATE + "," +    // 4
 
-                FIELD_SOURCE + "," +            // 5
-                FIELD_VOLUME + "," +            // 6
-                FIELD_SECTION + "," +           // 7
-                FIELD_PAGE + "," +              // 8
-                FIELD_PSEUDONYM + "," +         // 9
-                FIELD_REPORTER + "," +          // 10
+                FIELD_TITLE + "," +             // 5
+                FIELD_SUB_TITLE + "," +         // 6
 
-                FIELD_REMARK + "," +            // 11
+                FIELD_IMPORTANCE + "," +        // 7
+                FIELD_PERSON + "," +            // 8
+                FIELD_REPORTER + "," +          // 9
+                FIELD_PSEUDONYM + "," +         // 10
 
-                FIELD_GREG_DATE + "," +         // 12
-                FIELD_MAN_GREG_DATE + "," +     // 13
-                FIELD_HEB_DATE + "," +          // 14
-                FIELD_MAN_HEB_DATE + "," +      // 15
-                FIELD_CANONIZED_DATE + "," +    // 16
 
-                FIELD_IMPORTANCE + "," +        // 17
-                FIELD_PERSON + "," +            // 18
+                FIELD_VOLUME + "," +            // 11
+                FIELD_SECTION + "," +           // 12
+                FIELD_PAGE + "," +              // 13
+
+                FIELD_REMARK + "," +            // 14
+
+                FIELD_GREG_DATE + "," +         // 15
+                FIELD_MAN_GREG_DATE + "," +     // 16
+                FIELD_HEB_DATE + "," +          // 17
+                FIELD_MAN_HEB_DATE + "," +      // 18
+
                 FIELD_CARD +                    // 19
 
                 ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -87,7 +90,7 @@ public class SqliteHandler {
             e.printStackTrace();
         }
 
-        String databaseName = null;
+        String databaseName;
         if (dbNameOptional.length > 0)
             databaseName = dbNameOptional[0];
         else
@@ -113,8 +116,8 @@ public class SqliteHandler {
         return connection;
     }
 
-    public Card getDbCard(String id) {
-        String query = "select * from cards where " + FIELD_CARD_ID + " = \'" + id + "\'";
+    public Card getDbCardById(String id) {
+        String query = "select * from cards where " + FIELD_CARD_ID + " = '" + id + "'";
         List<Card> cardList = SqliteHandler.getHandler().executeSelectCardsQuery(query);
         if (cardList.size() != 1) {
             System.err.println("retrieved uuid <" + id + "> from db, got " + cardList.size() + " results, expected exactly 1");
@@ -151,24 +154,24 @@ public class SqliteHandler {
         try {
             PreparedStatement statement = database.prepareStatement(sqlInsertCard);
 
-            statement.setInt(1, card.getCardNumber());
+            statement.setInt(   1, card.getCardNumber());
             statement.setString(2, card.getCardType().toString());
-            statement.setString(3, card.getLineContent(Line.LineType.TITLE));
-            statement.setString(4, card.getLineContent(Line.LineType.SUB_TITLE));
-            statement.setString(5, card.getLineContent(Line.LineType.SOURCE));
-            statement.setString(6, card.getLineContent(Line.LineType.VOLUME));
-            statement.setString(7, card.getLineContent(Line.LineType.SECTION));
-            statement.setString(8, card.getLineContent(Line.LineType.PAGE));
-            statement.setString(9, card.getLineContent(Line.LineType.PSEUDONYM));
-            statement.setString(10, card.getLineContent(Line.LineType.REPORTER));
-            statement.setString(11, card.getLineContent(Line.LineType.REMARK));
-            statement.setString(12, card.getLineContent(Line.LineType.GREG_DATE));
-            statement.setString(13, card.getLineContent(Line.LineType.MANUAL_GREG_DATE));
-            statement.setString(14, card.getLineContent(Line.LineType.HEB_DATE));
-            statement.setString(15, card.getLineContent(Line.LineType.MANUAL_HEB_DATE));
-            statement.setString(16, card.getCanonizedDate());
-            statement.setString(17, card.getLineContent(Line.LineType.IMPORTANCE));
-            statement.setString(18, card.getLineContent(Line.LineType.PERSON));
+            statement.setString(3, card.getLineContent(Line.LineType.SOURCE));
+            statement.setString(4, card.getCanonizedDate());
+            statement.setString(5, card.getLineContent(Line.LineType.TITLE));
+            statement.setString(6, card.getLineContent(Line.LineType.SUB_TITLE));
+            statement.setString(7, card.getLineContent(Line.LineType.IMPORTANCE));
+            statement.setString(8, card.getLineContent(Line.LineType.PERSON));
+            statement.setString(9, card.getLineContent(Line.LineType.REPORTER));
+            statement.setString(10, card.getLineContent(Line.LineType.PSEUDONYM));
+            statement.setString(11, card.getLineContent(Line.LineType.VOLUME));
+            statement.setString(12, card.getLineContent(Line.LineType.SECTION));
+            statement.setString(13, card.getLineContent(Line.LineType.PAGE));
+            statement.setString(14, card.getLineContent(Line.LineType.REMARK));
+            statement.setString(15, card.getLineContent(Line.LineType.GREG_DATE));
+            statement.setString(16, card.getLineContent(Line.LineType.MANUAL_GREG_DATE));
+            statement.setString(17, card.getLineContent(Line.LineType.HEB_DATE));
+            statement.setString(18, card.getLineContent(Line.LineType.MANUAL_HEB_DATE));
             statement.setString(19, card.getLineContent(Line.LineType.CARD));
 
             result = statement.executeUpdate();
@@ -186,70 +189,39 @@ public class SqliteHandler {
             card = Card.genCardByType(typeOfCard);
             card.setCardHeaderLineNumber(rs.getInt(FIELD_CARD_ID));
 
-            TitleLine titleLine = new TitleLine();
-            titleLine.setContent(rs.getString(FIELD_TITLE));
-            card.addLine(titleLine);
+            addLineToCard(card, new SourceLine(), rs.getString(FIELD_SOURCE));
 
-            SourceLine sourceLine = new SourceLine();
-            sourceLine.setContent(rs.getString(FIELD_SOURCE));
-            card.addLine(sourceLine);
-
-            SectionLine sectionLine = new SectionLine();
-            sectionLine.setContent(rs.getString(FIELD_SECTION));
-            card.addLine(sectionLine);
-
-            PageLine pageLine = new PageLine();
-            pageLine.setContent(rs.getString(FIELD_PAGE));
-            card.addLine(pageLine);
-
-            PseudonymLine pseudonymLine = new PseudonymLine();
-            pseudonymLine.setContent(rs.getString(FIELD_PSEUDONYM));
-            card.addLine(pseudonymLine);
-
-            ReporterLine reporterLine = new ReporterLine();
-            reporterLine.setContent(rs.getString(FIELD_REPORTER));
-            card.addLine(reporterLine);
-
-            RemarkLine remarkLine = new RemarkLine();
-            remarkLine.setContent(rs.getString(FIELD_REMARK));
-            card.addLine(remarkLine);
-
-            GregDateLine gregDateLine = new GregDateLine();
-            gregDateLine.setContent(rs.getString(FIELD_GREG_DATE));
-            card.addLine(gregDateLine);
-
-            ManualGregDateLine manualGregDateLine = new ManualGregDateLine();
-            manualGregDateLine.setContent(rs.getString(FIELD_MAN_GREG_DATE));
-            card.addLine(manualGregDateLine);
-
-            HebDateLine hebDateLine = new HebDateLine();
-            hebDateLine.setContent(rs.getString(FIELD_HEB_DATE));
-            card.addLine(hebDateLine);
-
-            ManualHebDateLine manualHebDateLine = new ManualHebDateLine();
-            manualHebDateLine.setContent(rs.getString(FIELD_MAN_HEB_DATE));
-            card.addLine(manualHebDateLine);
-
-            LocalDate canonizedDate = DateProcessor.getDateProcessor().getLocalDateFromString(rs.getString(FIELD_CANONIZED_DATE), -1);
+            LocalDate canonizedDate = DateProcessor.getDateProcessor().getLocalDateFromCanonized(rs.getString(FIELD_CANONIZED_DATE));
             card.setCanonizedDate(canonizedDate);
 
-            ImportanceLine importanceLine = new ImportanceLine();
-            importanceLine.setContent(rs.getString(FIELD_IMPORTANCE));
-            card.addLine(importanceLine);
-
-            PersonLine personLine = new PersonLine();
-            personLine.setContent(rs.getString(FIELD_PERSON));
-            card.addLine(personLine);
-
-            CardLine cardLine = new CardLine();
-            cardLine.setContent(rs.getString(FIELD_CARD));
-            card.addLine(cardLine);
+            addLineToCard(card, new TitleLine(), rs.getString(FIELD_TITLE));
+            addLineToCard(card, new SubTitleLine(), rs.getString(FIELD_SUB_TITLE));
+            addLineToCard(card, new ImportanceLine(), rs.getString(FIELD_IMPORTANCE));
+            addLineToCard(card, new PersonLine(), rs.getString(FIELD_PERSON));
+            addLineToCard(card, new ReporterLine(), rs.getString(FIELD_REPORTER));
+            addLineToCard(card, new PseudonymLine(), rs.getString(FIELD_PSEUDONYM));
+            addLineToCard(card, new VolumeLine(), rs.getString(FIELD_VOLUME));
+            addLineToCard(card, new SectionLine(), rs.getString(FIELD_SECTION));
+            addLineToCard(card, new PageLine(), rs.getString(FIELD_PAGE));
+            addLineToCard(card, new RemarkLine(), rs.getString(FIELD_REMARK));
+            addLineToCard(card, new GregDateLine(), rs.getString(FIELD_GREG_DATE));
+            addLineToCard(card, new ManualGregDateLine(), rs.getString(FIELD_MAN_GREG_DATE));
+            addLineToCard(card, new HebDateLine(), rs.getString(FIELD_HEB_DATE));
+            addLineToCard(card, new ManualHebDateLine(), rs.getString(FIELD_MAN_HEB_DATE));
+            addLineToCard(card, new CardLine(), rs.getString(FIELD_CARD));
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return card;
+    }
+
+    private void addLineToCard(Card card, Line line, String content) {
+        if (content != null) {
+            line.setContent(content, false);
+            card.addLine(line);
+        }
     }
 
     public List<Card> executeSelectCardsQuery(String sql) {
@@ -273,14 +245,18 @@ public class SqliteHandler {
         List<Card> cards = SqliteHandler.getHandler().executeSelectCardsQuery(query);
         for (int i = 0; i < cards.size(); i++) {
             Card card = cards.get(i);
-            Logger.log(1, i + ": id=" + card.getCardNumber() + ", type=" + card.getCardType() + ", canonizedDate=" + card.getCanonizedDate());
+            Logger.log(1, i +
+                    ": id=" + card.getCardNumber() +
+                    ", type=" + card.getCardType() +
+                    ", canonizedDate=" + card.getCanonizedDate());
         }
         Logger.log(1, "loaded " + cards.size() + " cards by query: <" + query + ">");
         return cards;
     }
 
     public static void main(String[] args) {
-        SqliteHandler.getHandler().loadAllCards("select * from cards");
+        List<Card> cards = SqliteHandler.getHandler().loadAllCards("select * from cards");
+        Logger.log(1, "loaded " + cards.size() + " cards");
     }
 
 

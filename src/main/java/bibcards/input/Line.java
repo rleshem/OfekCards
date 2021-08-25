@@ -9,11 +9,11 @@ import java.util.function.Supplier;
 
 public abstract class Line {
 
+    private static boolean propsLoaded = false;
     private final LineType type;
     protected String prefix;
     protected String content;
     protected boolean trimPunctuationChars = false;
-    private boolean propsLoaded = false;
     int dataLineNum = 0;
 
     public enum LineType {
@@ -89,9 +89,13 @@ public abstract class Line {
         return content;
     }
 
-    public void setContent(String inputLine) {
+    public void setContent(String inputLine, boolean isColonRequired) {
         if (!propsLoaded)
             loadProperties();
+        if (!isColonRequired) {
+            this.content = inputLine;
+            return;
+        }
         if (!inputLine.contains(":")) {
             Logger.error("line no. " +
                     Assimilator.getAssimilator().getNumLines() + " has no ':' character - cannot process");

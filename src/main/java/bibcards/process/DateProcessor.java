@@ -12,6 +12,7 @@ public class DateProcessor {
 
     private static DateProcessor dateProcessor = null;
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d.MM.uuuu");
+    private DateTimeFormatter canonizedDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-d");
     //    private List<DateTimeFormatter> formatters = new ArrayList<>();
     private int maxGregYear = Setup.getSetup().getIntProperty(Setup.maxGregorianYear);
     private int okParses = 0;
@@ -68,6 +69,18 @@ public class DateProcessor {
 
     private LocalDate getLocalDateFromGregDate(Line lineWithDate) {
         return getLocalDateFromString(lineWithDate.getContent().trim(), lineWithDate.getDataLineNum());
+    }
+
+    public LocalDate getLocalDateFromCanonized(String canonized) {
+        LocalDate localDate = null;
+        try {
+            localDate = LocalDate.parse(canonized, canonizedDateTimeFormatter);
+            Logger.log(4, "parsed OK canonized date <" + canonized + ">");
+            return localDate;
+        } catch (Exception e) {
+            Logger.error("failed on canonized date parsing of <" + canonized + ">");
+            return null;
+        }
     }
 
     public LocalDate getLocalDateFromString(String usableGregDateString, int lineNumber) {

@@ -35,11 +35,11 @@ public class Card {
 
     // CardType is enum of publication type of the subject
     public enum CardType {
-        WRITER,             // card detailing subject's publication
-        TRANSLATOR,         // card detailing publication of translation by subject
-        ABOUT_WRITER,       // card detailing publication about subject as writer
-        ABOUT_TRANSLATOR,   // card detailing publication about subject as translator
-        ABOUT_EDITOR,       // card detailing publication about subject as editor
+        WRITER,     // WRITER: card detailing subject's publication
+        TRNSLTR,    // TRANSLATOR: card detailing publication of translation by subject
+        ABT_WRTR,   // ABOUT_WRITER: card detailing publication about subject as writer
+        ABT_TR,     // ABOUT_TRANSLATOR: card detailing publication about subject as translator
+        ABT_EDTR,   // ABOUT_EDITOR: card detailing publication about subject as editor
     }
 
     private TitleLine titleLine = null;
@@ -71,16 +71,16 @@ public class Card {
     private String tmpDescriptor = new String("card: ");
 
     public static Card genCardByType(String typeOfCard) {
-        if (typeOfCard.equals(CardType.WRITER))
+        if (typeOfCard.equals(CardType.WRITER.name()))
             return new Card(CardType.WRITER);
-        else if (typeOfCard.equals(CardType.TRANSLATOR))
-            return new Card(CardType.TRANSLATOR);
-        else if (typeOfCard.equals(CardType.ABOUT_WRITER))
-            return new Card(CardType.ABOUT_WRITER);
-        else if (typeOfCard.equals(CardType.ABOUT_TRANSLATOR))
-            return new Card(CardType.ABOUT_TRANSLATOR);
-        else if (typeOfCard.equals(CardType.ABOUT_EDITOR))
-            return new Card(CardType.ABOUT_EDITOR);
+        else if (typeOfCard.equals(CardType.TRNSLTR.name()))
+            return new Card(CardType.TRNSLTR);
+        else if (typeOfCard.equals(CardType.ABT_WRTR.name()))
+            return new Card(CardType.ABT_WRTR);
+        else if (typeOfCard.equals(CardType.ABT_TR.name()))
+            return new Card(CardType.ABT_TR);
+        else if (typeOfCard.equals(CardType.ABT_EDTR.name()))
+            return new Card(CardType.ABT_EDTR);
         else
             throw new IllegalArgumentException("unknown card type <" + typeOfCard + ">");
     }
@@ -89,13 +89,13 @@ public class Card {
         if (header.startsWith(cardWriter))
             return new Card(CardType.WRITER, header);
         else if (header.startsWith(cardTranslator))
-            return new Card(CardType.TRANSLATOR, header);
+            return new Card(CardType.TRNSLTR, header);
         else if (header.startsWith(cardAboutWriter))
-            return new Card(CardType.ABOUT_WRITER, header);
+            return new Card(CardType.ABT_WRTR, header);
         else if (header.startsWith(cardAboutTranslator))
-            return new Card(CardType.ABOUT_TRANSLATOR, header);
+            return new Card(CardType.ABT_TR, header);
         else if (header.startsWith(cardAboutEditor))
-            return new Card(CardType.ABOUT_EDITOR, header);
+            return new Card(CardType.ABT_EDTR, header);
         else
             throw new IllegalArgumentException("unknown card header <" + header + ">");
     }
@@ -110,7 +110,7 @@ public class Card {
 
     private Card(CardType cardType) {
         this.cardType = cardType;
-        this.cardLine = null;
+        this.cardLine = new CardLine();
     }
 
     private Card(CardType cardType, String cardHeader) {
@@ -203,7 +203,7 @@ public class Card {
 
     public String getCanonizedDate() {
         if (canonizedDate == null) {
-            Logger.error("card " + cardNumber + ": no canonizedDate");
+            Logger.log(3, "card " + cardNumber + ": no canonizedDate");
             return cardNumber + ": ~no canonized date~";
         }
 

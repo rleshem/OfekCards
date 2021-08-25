@@ -3,15 +3,20 @@ CREATE TABLE cards (
     id INTEGER PRIMARY KEY,
     type TEXT,
 
+    source TEXT,
+    canonized_date TEXT,
+
     title TEXT,
     sub_title TEXT,
 
-    source TEXT,
+    importance TEXT,
+    person TEXT,
+    reporter TEXT,
+    pseudonym TEXT,
+
     volume TEXT,
     section TEXT,
     page TEXT,
-    pseudonym TEXT,
-    reporter TEXT,
 
     remark TEXT,
 
@@ -19,10 +24,7 @@ CREATE TABLE cards (
     man_greg_date TEXT,
     heb_date TEXT,
     man_heb_date TEXT,
-    canonized_date TEXT,
 
-    importance TEXT,
-    person TEXT,
     card TEXT
 
 );

@@ -17,9 +17,8 @@ import java.util.Map;
 
 public class Assimilator {
 
-    private Map<Line.LineType, Integer> maxLineLenMap = new HashMap<Line.LineType, Integer>();
-    private static char prefixEnd = ':';
-    private static String commentChar = "#";
+    private final Map<Line.LineType, Integer> maxLineLenMap = new HashMap<>();
+    private final static String commentChar = "#";
     private static Assimilator assimilator = null;
     private File dataFile;
     private BufferedReader reader;
@@ -136,12 +135,12 @@ public class Assimilator {
             if (line == null) {
                 Logger.error("line type not identified, line=<" + nextContentLine + ">");
             } else {
-                line.setContent(nextContentLine);
+                line.setContent(nextContentLine, true);
                 card.addLine(line, numLines);
 
                 // check if current line is longer than previous lines of the same type
                 Integer currMax = maxLineLenMap.get(line.getType());
-                int currMaxLen = (currMax == null) ? 0 : maxLineLenMap.get(line.getType()).intValue();
+                int currMaxLen = (currMax == null) ? 0 : maxLineLenMap.get(line.getType());
                 if (currMaxLen < line.getContent().length())
                     maxLineLenMap.put(line.getType(), line.getContent().length());
             }
@@ -177,7 +176,8 @@ public class Assimilator {
 
         int numStoreCards = Setup.getSetup().getIntProperty(Setup.numStoreCardsProp);
         if (numStoreCards < 1) {
-            SqliteHandler.getHandler().insertListOfCards(cards, false);
+            int insertedCards = SqliteHandler.getHandler().insertListOfCards(cards, false);
+            Logger.log(1, "inserted " + insertedCards + " OK");
         } else {
             for (int j = 0; j < numStoreCards; j++) {
                 SqliteHandler.getHandler().insertCard(cards.get(j), false);
