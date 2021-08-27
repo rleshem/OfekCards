@@ -17,6 +17,7 @@ public class Setup {
     public static String maxGregorianYear = "max_gregorian_year";
     public static String numStoreCardsProp = "num_store_cards";
     public static String trimPunctuationCharsProp = "trim_punctuation_chars";
+    public static String csvFileName = "csv_file_name";
 
     /*
         public static String dbProp = "db";

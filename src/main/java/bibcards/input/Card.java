@@ -33,6 +33,10 @@ public class Card {
                 '}';
     }
 
+    public void setCardNumber(int number) {
+        this.cardNumber = number;
+    }
+
     // CardType is enum of publication type of the subject
     public enum CardType {
         WRITER,     // WRITER: card detailing subject's publication
@@ -143,43 +147,44 @@ public class Card {
         }
     }
 
-    public String getLineContent(Line.LineType lineType) {
+    public String getLineContent(Line.LineType lineType, boolean isAllowReturnNull) {
+        String noContentValue = isAllowReturnNull ? null : "";
         switch (lineType) {
             case TITLE:
-                return (titleLine != null) ? titleLine.getContent() : null;
+                return (titleLine != null) ? titleLine.getContent() : noContentValue;
             case REMARK:
-                return (remarkLine != null) ? remarkLine.getContent() : null;
+                return (remarkLine != null) ? remarkLine.getContent() : noContentValue;
             case SOURCE:
-                return (sourceLine != null) ? sourceLine.getContent() : null;
+                return (sourceLine != null) ? sourceLine.getContent() : noContentValue;
             case IMPORTANCE:
-                return (importanceLine != null) ? importanceLine.getContent() : null;
+                return (importanceLine != null) ? importanceLine.getContent() : noContentValue;
             case PSEUDONYM:
-                return (pseudonymLine != null) ? pseudonymLine.getContent() : null;
+                return (pseudonymLine != null) ? pseudonymLine.getContent() : noContentValue;
             case CARD:
-                return (cardLine != null) ? cardLine.getContent() : null;
+                return (cardLine != null) ? cardLine.getContent() : noContentValue;
             case SUB_TITLE:
-                return (subTitleLine != null) ? subTitleLine.getContent() : null;
+                return (subTitleLine != null) ? subTitleLine.getContent() : noContentValue;
             case GREG_DATE:
-                return (gregDateLine != null) ? gregDateLine.getContent() : null;
+                return (gregDateLine != null) ? gregDateLine.getContent() : noContentValue;
             case HEB_DATE:
-                return (hebDateLine != null) ? hebDateLine.getContent() : null;
+                return (hebDateLine != null) ? hebDateLine.getContent() : noContentValue;
             case PAGE:
-                return (pageLine != null) ? pageLine.getContent() : null;
+                return (pageLine != null) ? pageLine.getContent() : noContentValue;
             case PERSON:
-                return (personLine != null) ? personLine.getContent() : null;
+                return (personLine != null) ? personLine.getContent() : noContentValue;
             case REPORTER:
-                return (reporterLine != null) ? reporterLine.getContent() : null;
+                return (reporterLine != null) ? reporterLine.getContent() : noContentValue;
             case SECTION:
-                return (sectionLine != null) ? sectionLine.getContent() : null;
+                return (sectionLine != null) ? sectionLine.getContent() : noContentValue;
             case MANUAL_GREG_DATE:
-                return (manualGregDateLine != null) ? manualGregDateLine.getContent() : null;
+                return (manualGregDateLine != null) ? manualGregDateLine.getContent() : noContentValue;
             case MANUAL_HEB_DATE:
-                return (manualHebDateLine != null) ? manualHebDateLine.getContent() : null;
+                return (manualHebDateLine != null) ? manualHebDateLine.getContent() : noContentValue;
             case VOLUME:
-                return (volumeLine != null) ? volumeLine.getContent() : null;
+                return (volumeLine != null) ? volumeLine.getContent() : noContentValue;
             default:
                 Logger.error("cannot handle line type=" + lineType);
-                return null;
+                return noContentValue;
         }
     }
 

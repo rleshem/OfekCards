@@ -32,6 +32,9 @@ public abstract class Line {
         MANUAL_GREG_DATE,   // ג (תאריך לועזי מתוקנן)
         MANUAL_HEB_DATE,    // ב (תאריך עברי מתוקנן)
         VOLUME,             //צ (כרך \ גיליון \ שנה \ וכו' )
+
+        CANONIZED_DATE,     // calculated, not found in data
+
         CARD        // כ (כרטיס-גנזים)
     }
 

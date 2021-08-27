@@ -166,7 +166,7 @@ public class Assimilator {
         int i = 0;
         if (Setup.getSetup().getBooleanProperty(Setup.dumpCards)) {
             for (Card card : cards) {
-                Logger.log(4, "card=" + card.getCardNumber() + ": name=" + card.getLineContent(Line.LineType.TITLE) + ", source=" + card.getLineContent(Line.LineType.SOURCE) + ", importance=" + card.getLineContent(Line.LineType.IMPORTANCE));
+                Logger.log(4, "card=" + card.getCardNumber() + ": name=" + card.getLineContent(Line.LineType.TITLE, true) + ", source=" + card.getLineContent(Line.LineType.SOURCE, true) + ", importance=" + card.getLineContent(Line.LineType.IMPORTANCE, true));
                 if ((i++ % 50) == 0)
                     Logger.log(4, "### " + card.toString());
             }

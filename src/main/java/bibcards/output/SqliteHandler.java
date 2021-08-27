@@ -156,23 +156,23 @@ public class SqliteHandler {
 
             statement.setInt(   1, card.getCardNumber());
             statement.setString(2, card.getCardType().toString());
-            statement.setString(3, card.getLineContent(Line.LineType.SOURCE));
+            statement.setString(3, card.getLineContent(Line.LineType.SOURCE, true));
             statement.setString(4, card.getCanonizedDate());
-            statement.setString(5, card.getLineContent(Line.LineType.TITLE));
-            statement.setString(6, card.getLineContent(Line.LineType.SUB_TITLE));
-            statement.setString(7, card.getLineContent(Line.LineType.IMPORTANCE));
-            statement.setString(8, card.getLineContent(Line.LineType.PERSON));
-            statement.setString(9, card.getLineContent(Line.LineType.REPORTER));
-            statement.setString(10, card.getLineContent(Line.LineType.PSEUDONYM));
-            statement.setString(11, card.getLineContent(Line.LineType.VOLUME));
-            statement.setString(12, card.getLineContent(Line.LineType.SECTION));
-            statement.setString(13, card.getLineContent(Line.LineType.PAGE));
-            statement.setString(14, card.getLineContent(Line.LineType.REMARK));
-            statement.setString(15, card.getLineContent(Line.LineType.GREG_DATE));
-            statement.setString(16, card.getLineContent(Line.LineType.MANUAL_GREG_DATE));
-            statement.setString(17, card.getLineContent(Line.LineType.HEB_DATE));
-            statement.setString(18, card.getLineContent(Line.LineType.MANUAL_HEB_DATE));
-            statement.setString(19, card.getLineContent(Line.LineType.CARD));
+            statement.setString(5, card.getLineContent(Line.LineType.TITLE, true));
+            statement.setString(6, card.getLineContent(Line.LineType.SUB_TITLE, true));
+            statement.setString(7, card.getLineContent(Line.LineType.IMPORTANCE, true));
+            statement.setString(8, card.getLineContent(Line.LineType.PERSON, true));
+            statement.setString(9, card.getLineContent(Line.LineType.REPORTER, true));
+            statement.setString(10, card.getLineContent(Line.LineType.PSEUDONYM, true));
+            statement.setString(11, card.getLineContent(Line.LineType.VOLUME, true));
+            statement.setString(12, card.getLineContent(Line.LineType.SECTION, true));
+            statement.setString(13, card.getLineContent(Line.LineType.PAGE, true));
+            statement.setString(14, card.getLineContent(Line.LineType.REMARK, true));
+            statement.setString(15, card.getLineContent(Line.LineType.GREG_DATE, true));
+            statement.setString(16, card.getLineContent(Line.LineType.MANUAL_GREG_DATE, true));
+            statement.setString(17, card.getLineContent(Line.LineType.HEB_DATE, true));
+            statement.setString(18, card.getLineContent(Line.LineType.MANUAL_HEB_DATE, true));
+            statement.setString(19, card.getLineContent(Line.LineType.CARD, true));
 
             result = statement.executeUpdate();
         } catch (SQLException e) {
@@ -187,7 +187,7 @@ public class SqliteHandler {
         try {
             String typeOfCard = rs.getString(FIELD_TYPE);
             card = Card.genCardByType(typeOfCard);
-            card.setCardHeaderLineNumber(rs.getInt(FIELD_CARD_ID));
+            card.setCardNumber(rs.getInt(FIELD_CARD_ID));
 
             addLineToCard(card, new SourceLine(), rs.getString(FIELD_SOURCE));
 
